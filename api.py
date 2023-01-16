@@ -122,5 +122,72 @@ def get_hum(ids: int):
     return List_Temperature_Humidity(temp_hums=db.get_hum(hum_id=ids))
 
 
+@app.get("/get_average_temperature")
+def get_average_temperature():
+    """
+
+        Функция для получения средней температуры
+
+        :return: список со значениями средней температуры
+
+    """
+    a = db.get_temp_from_temp_hum()
+    t = 0
+    q = []
+    e = 0
+    for i in a:
+        if e < 4:
+            t += i
+            e += 1
+        if e == 4:
+            q.append(t/e)
+            e = 0
+    return q
+
+
+@app.get("/get_average_humidity")
+def get_average_humidity():
+    """
+
+        Функция для получения средней влажности воздуха
+
+        :return: список со значениями средней влажности воздуха
+
+    """
+
+    a = db.get_hum_from_temp_hum()
+    t = 0
+    q = []
+    e = 0
+    for i in a:
+        if e < 4:
+            t += i
+            e += 1
+        if e == 4:
+            q.append(t / e)
+            e = 0
+    return q
+
+
+@app.get("/get_hum_temp/{id}")
+def get_hum_temp(ids: int):
+    return List_Temperature_Humidity(temp_hums=db.get_hum_temp(id=ids))
+
+
+@app.get("/get_total_hum")
+def get_total_hum():
+    return db.get_total_hum()
+
+
+@app.get("/get_warnings")
+def get_warnings():
+    return db.get_warnings()
+
+
+@app.get("/get_watering/{id}")
+def get_watering(ids: int):
+    return db.get_watering(id=ids)
+
+
 if __name__ == '__main__':
     uvicorn.run("api:app", host="127.0.0.1", port=8000)
