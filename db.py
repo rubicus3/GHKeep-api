@@ -37,7 +37,7 @@ def wrapper():
 # ---------------------------------------------------- DB Create ----------------------------------------------------- #
 
 
-def create_fork(**kwargs):
+def create_fork():
     """
 
         Функция для создания форточек
@@ -47,7 +47,7 @@ def create_fork(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Create_fork(?)", kwargs['state'])
+    cur.execute("CALL Create_fork();")
     conn.commit()
     conn.close()
 
@@ -63,7 +63,7 @@ def create_hum(**kwargs):
     conn = wrapper()
     cur = conn.cursor()
     a: Temperature_Humidity = kwargs['temperature_humidity']
-    cur.execute("CALL Create_hum(?, ?)", a.id, a.humidity)
+    cur.execute("CALL Create_hum(?, ?)", (int(a.id), a.humidity))
     conn.commit()
     conn.close()
 
@@ -79,12 +79,12 @@ def create_temp_hum(**kwargs):
     conn = wrapper()
     cur = conn.cursor()
     a: Temperature_Humidity = kwargs["temperature_humidity"]
-    cur.execute("CALL Create_temp_hum(?, ?, ?)", a.id, a.temperature, a.humidity)
+    cur.execute("CALL Create_temp_hum(?, ?, ?)", (a.id, a.temperature, a.humidity))
     conn.commit()
     conn.close()
 
 
-def create_total_hum(**kwargs):
+def create_total_hum():
     """
 
         Функция для создания единой системы увлажнения
@@ -94,7 +94,7 @@ def create_total_hum(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Create_total_hum(?)", kwargs["state"])
+    cur.execute("CALL Create_total_hum();")
     conn.commit()
     conn.close()
 
@@ -109,13 +109,13 @@ def create_watering(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    a: Watering = kwargs["watering"]
-    cur.execute("CALL Create_watering(?, ?)", a.id, a.state)
+    a = kwargs["id"]
+    cur.execute("CALL Create_watering(?, ?)", (a,))
     conn.commit()
     conn.close()
 
 
-def create_warnings(**kwargs):
+def create_warnings():
     """
 
         Функция для создания порогов среднего значения значений
@@ -125,11 +125,9 @@ def create_warnings(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    a: Warnings = kwargs["warnings"]
-    cur.execute("CALL Create_warnings(?, ?, ?)", a.temperature, a.humidity_air, a.humidity_soil)
+    cur.execute("CALL Create_warnings();")
     conn.commit()
     conn.close()
-
 
 
 # ------------------------------------------------------ DB PUT ------------------------------------------------------ #
@@ -143,7 +141,7 @@ def change_fork():
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Change_fork()")
+    cur.execute("CALL Change_fork();")
     conn.commit()
     conn.close()
 
@@ -156,7 +154,7 @@ def change_total_hum():
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Change_total_hum()")
+    cur.execute("CALL Change_total_hum();")
     conn.commit()
     conn.close()
 
@@ -171,7 +169,7 @@ def change_watering(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Change_watering(?)", kwargs['id'])
+    cur.execute("CALL Change_watering(?)", (kwargs['id'],))
     conn.commit()
     conn.close()
 
@@ -186,7 +184,7 @@ def change_warnings_temp(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Change_warnings_temp(?)", kwargs["temperature"])
+    cur.execute("CALL Change_warnings_temp(?)", (kwargs["temperature"],))
     conn.commit()
     conn.close()
 
@@ -201,7 +199,7 @@ def change_warnings_h(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Change_warnings_h(?)", kwargs["humidity_air"])
+    cur.execute("CALL Change_warnings_h(?)", (kwargs["humidity_air"],))
     conn.commit()
     conn.close()
 
@@ -216,7 +214,7 @@ def change_warnings_hb(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Change_warnings_hb(?)", kwargs["humidity_soil"])
+    cur.execute("CALL Change_warnings_hb(?)", (kwargs["humidity_soil"],))
     conn.commit()
     conn.close()
 
@@ -234,7 +232,7 @@ def get_fork():
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_fork()")
+    cur.execute("CALL Get_fork();")
     stat = ''
     for i in cur:
         for x in i:
@@ -255,7 +253,7 @@ def get_hum(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_hum(?)", kwargs["hum_id"])
+    cur.execute("CALL Get_hum(?)", (kwargs["hum_id"],))
     a = []
     for p_id, humidity in cur:
         a.append(Temperature_Humidity(id=p_id, humidity=humidity))
@@ -273,7 +271,7 @@ def get_temp_from_temp_hum():
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_temp_from_temp_hum()")
+    cur.execute("CALL Get_temp_from_temp_hum();")
     a = []
     for i in cur:
         for x in i:
@@ -294,7 +292,7 @@ def get_hum_temp(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_hum_temp(?)", kwargs["id"])
+    cur.execute("CALL Get_hum_temp(?)", (kwargs["id"],))
     a = []
     for p_id, temp, hum in cur:
         a.append(Temperature_Humidity(id=p_id, temperature=temp, humidity=hum))
@@ -312,7 +310,7 @@ def get_hum_from_temp_hum():
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_hum_from_temp_hum()")
+    cur.execute("CALL Get_hum_from_temp_hum();")
     a = []
     for i in cur:
         for x in i:
@@ -330,7 +328,7 @@ def get_total_hum():
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_total_hum()")
+    cur.execute("CALL Get_total_hum();")
     stat = ''
     for i in cur:
         for x in i:
@@ -339,7 +337,7 @@ def get_total_hum():
     return stat
 
 
-def get_warnings()
+def get_warnings():
     """
     
         Функция для получения порогов средних значений
@@ -349,7 +347,7 @@ def get_warnings()
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_warnings()")
+    cur.execute("CALL Get_warnings();")
     a = []
     for temp, hum, hd in cur:
         a.append(Warnings(temperature=temp, humidity_air=hum, humidity_soil=hd))
@@ -369,7 +367,7 @@ def get_watering(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
-    cur.execute("CALL Get_watering(?)", kwargs["id"])
+    cur.execute("CALL Get_watering(?)", (kwargs["id"],))
     stat = ''
     for i in cur:
         for x in i:

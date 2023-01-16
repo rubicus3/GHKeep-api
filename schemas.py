@@ -31,4 +31,7 @@ class Warnings(BaseModel):
 
 
 class List_Temperature_Humidity(BaseModel):
-    temp_hum: List[Temperature_Humidity]
+    temp_hums: List[Temperature_Humidity]
+
+
+

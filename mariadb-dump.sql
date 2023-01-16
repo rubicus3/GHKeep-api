@@ -55,6 +55,7 @@ CREATE TABLE `hum` (
 
 LOCK TABLES `hum` WRITE;
 /*!40000 ALTER TABLE `hum` DISABLE KEYS */;
+INSERT INTO `hum` VALUES (1,1.2);
 /*!40000 ALTER TABLE `hum` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -122,6 +123,7 @@ CREATE TABLE `warnings` (
 
 LOCK TABLES `warnings` WRITE;
 /*!40000 ALTER TABLE `warnings` DISABLE KEYS */;
+INSERT INTO `warnings` VALUES (20,70,50);
 /*!40000 ALTER TABLE `warnings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -303,14 +305,12 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_fork`(
-	st bool
-)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_fork`()
 begin
-	insert into case_8
+	insert into fork
 	(state)
 	values
-	(st);
+	(0);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -378,14 +378,12 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_total_hum`(
-	st bool
-)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_total_hum`()
 begin
 	insert into case_8.total_hum 
 	(state)
 	values
-	(st);
+	(0);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -402,16 +400,13 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_warnings`(
-	tem float,
-	hum float,
-	hb float
-)
-begin
+CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_warnings`()
+begin
+	
 	insert into case_8.warnings 
 	(temperature, humidity_air, humidity_soil)
 	values
-	(tem, hym, hb);
+	(20.0, 70.0, 50.0);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -429,14 +424,13 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_watering`(
-	p_id int,
-	st bool
+	p_id int
 )
 begin
 	insert into case_8.watering 
 	(id, state)
 	values
-	(p_id, st);
+	(p_id, 0);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -611,4 +605,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-11 20:04:01
+-- Dump completed on 2023-01-16 10:08:57
