@@ -11,6 +11,7 @@ class Temperature_Humidity(BaseModel):
     id: Optional[int]
     humidity: Optional[float]
     temperature: Optional[float]
+    tim: Optional[str]
 
 
 class Watering(BaseModel):

@@ -33,6 +33,7 @@ CREATE TABLE `fork` (
 
 LOCK TABLES `fork` WRITE;
 /*!40000 ALTER TABLE `fork` DISABLE KEYS */;
+INSERT INTO `fork` VALUES (0);
 /*!40000 ALTER TABLE `fork` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -45,7 +46,8 @@ DROP TABLE IF EXISTS `hum`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `hum` (
   `id` int(11) DEFAULT NULL,
-  `humidity` float DEFAULT NULL
+  `humidity` float DEFAULT NULL,
+  `Tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -55,7 +57,6 @@ CREATE TABLE `hum` (
 
 LOCK TABLES `hum` WRITE;
 /*!40000 ALTER TABLE `hum` DISABLE KEYS */;
-INSERT INTO `hum` VALUES (1,1.2);
 /*!40000 ALTER TABLE `hum` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -69,7 +70,8 @@ DROP TABLE IF EXISTS `temp_hum`;
 CREATE TABLE `temp_hum` (
   `id` int(11) DEFAULT NULL,
   `temperature` float DEFAULT NULL,
-  `humidity` float DEFAULT NULL
+  `humidity` float DEFAULT NULL,
+  `tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -329,13 +331,14 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_hum`(
 	p_id int,
-	hum float
+	hum float,
+	tim varchar(8)
 )
 begin
 	insert into case_8.hum 
-	(id, humidity)
+	(id, humidity, Tim)
 	values
-	(p_id, hum);
+	(p_id, hum, tim);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -355,13 +358,14 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_temp_hum`(
 	p_id int,
 	temp float,
-	hum float
+	hum float,
+	tim varchar(8)
 )
 begin
 	insert into case_8.temp_hum 
-	(id, temperature, humidity)
+	(id, temperature, humidity, tim)
 	values
-	(p_id, temp, hum);
+	(p_id, temp, hum, tim);
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -605,4 +609,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-16 10:08:57
+-- Dump completed on 2023-01-16 11:03:48

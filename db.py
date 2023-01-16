@@ -63,7 +63,7 @@ def create_hum(**kwargs):
     conn = wrapper()
     cur = conn.cursor()
     a: Temperature_Humidity = kwargs['temperature_humidity']
-    cur.execute("CALL Create_hum(?, ?)", (int(a.id), a.humidity))
+    cur.execute("CALL Create_hum(?, ?, ?)", (int(a.id), a.humidity, a.tim))
     conn.commit()
     conn.close()
 
@@ -255,8 +255,8 @@ def get_hum(**kwargs):
     cur = conn.cursor()
     cur.execute("CALL Get_hum(?)", (kwargs["hum_id"],))
     a = []
-    for p_id, humidity in cur:
-        a.append(Temperature_Humidity(id=p_id, humidity=humidity))
+    for p_id, humidity, tim in cur:
+        a.append(Temperature_Humidity(id=p_id, humidity=humidity, tim=tim))
     conn.close()
     return a
 
@@ -294,8 +294,8 @@ def get_hum_temp(**kwargs):
     cur = conn.cursor()
     cur.execute("CALL Get_hum_temp(?)", (kwargs["id"],))
     a = []
-    for p_id, temp, hum in cur:
-        a.append(Temperature_Humidity(id=p_id, temperature=temp, humidity=hum))
+    for p_id, temp, hum, tim in cur:
+        a.append(Temperature_Humidity(id=p_id, temperature=temp, humidity=hum, tim=tim))
     conn.close()
     return a
 
