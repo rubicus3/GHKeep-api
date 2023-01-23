@@ -46,10 +46,15 @@ def create_fork():
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Create_fork();")
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def create_hum(**kwargs):
@@ -61,11 +66,16 @@ def create_hum(**kwargs):
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     a: Temperature_Humidity = kwargs['temperature_humidity']
     cur.execute("CALL Create_hum(?, ?, ?)", (int(a.id), a.humidity, a.tim))
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def create_temp_hum(**kwargs):
@@ -78,10 +88,15 @@ def create_temp_hum(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
+    conn.autocommit = True
     a: Temperature_Humidity = kwargs["temperature_humidity"]
-    cur.execute("CALL Create_temp_hum(?, ?, ?)", (a.id, a.temperature, a.humidity))
-    conn.commit()
+    cur.execute("CALL Create_temp_hum(?, ?, ?, ?)", (a.id, a.temperature, a.humidity, a.tim))
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def create_total_hum():
@@ -93,10 +108,15 @@ def create_total_hum():
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Create_total_hum();")
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def create_watering(**kwargs):
@@ -109,10 +129,15 @@ def create_watering(**kwargs):
     """
     conn = wrapper()
     cur = conn.cursor()
+    conn.autocommit = True
     a = kwargs["id"]
-    cur.execute("CALL Create_watering(?, ?)", (a,))
-    conn.commit()
+    cur.execute("CALL Create_watering(?)", (a,))
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def create_warnings():
@@ -124,10 +149,15 @@ def create_warnings():
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Create_warnings();")
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 # ------------------------------------------------------ DB PUT ------------------------------------------------------ #
@@ -140,10 +170,15 @@ def change_fork():
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Change_fork();")
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def change_total_hum():
@@ -153,10 +188,15 @@ def change_total_hum():
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Change_total_hum();")
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def change_watering(**kwargs):
@@ -168,10 +208,15 @@ def change_watering(**kwargs):
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Change_watering(?)", (kwargs['id'],))
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def change_warnings_temp(**kwargs):
@@ -183,10 +228,15 @@ def change_warnings_temp(**kwargs):
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Change_warnings_temp(?)", (kwargs["temperature"],))
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def change_warnings_h(**kwargs):
@@ -198,10 +248,15 @@ def change_warnings_h(**kwargs):
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Change_warnings_h(?)", (kwargs["humidity_air"],))
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 def change_warnings_hb(**kwargs):
@@ -213,10 +268,15 @@ def change_warnings_hb(**kwargs):
 
     """
     conn = wrapper()
+    conn.autocommit = True
     cur = conn.cursor()
     cur.execute("CALL Change_warnings_hb(?)", (kwargs["humidity_soil"],))
-    conn.commit()
+    stat = ''
+    for i in cur:
+        for x in i:
+            stat = x
     conn.close()
+    return stat
 
 
 # ------------------------------------------------------ DB GET ------------------------------------------------------ #
@@ -255,10 +315,10 @@ def get_hum(**kwargs):
     cur = conn.cursor()
     cur.execute("CALL Get_hum(?)", (kwargs["hum_id"],))
     a = []
-    for p_id, humidity, tim in cur:
+    for a_id, p_id, humidity, tim in cur:
         a.append(Temperature_Humidity(id=p_id, humidity=humidity, tim=tim))
     conn.close()
-    return a
+    return a[::-1]
 
 
 def get_temp_from_temp_hum():
@@ -294,10 +354,10 @@ def get_hum_temp(**kwargs):
     cur = conn.cursor()
     cur.execute("CALL Get_hum_temp(?)", (kwargs["id"],))
     a = []
-    for p_id, temp, hum, tim in cur:
+    for a_id, p_id, temp, hum, tim in cur:
         a.append(Temperature_Humidity(id=p_id, temperature=temp, humidity=hum, tim=tim))
     conn.close()
-    return a
+    return a[::-1]
 
 
 def get_hum_from_temp_hum():
@@ -348,9 +408,9 @@ def get_warnings():
     conn = wrapper()
     cur = conn.cursor()
     cur.execute("CALL Get_warnings();")
-    a = []
+    a = ''
     for temp, hum, hd in cur:
-        a.append(Warnings(temperature=temp, humidity_air=hum, humidity_soil=hd))
+        a = Warnings(temperature=temp, humidity_air=hum, humidity_soil=hd)
     conn.close()
     return a
 

@@ -45,9 +45,11 @@ DROP TABLE IF EXISTS `hum`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `hum` (
+  `a_id` int(11) NOT NULL AUTO_INCREMENT,
   `id` int(11) DEFAULT NULL,
   `humidity` float DEFAULT NULL,
-  `Tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `Tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`a_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -68,11 +70,13 @@ DROP TABLE IF EXISTS `temp_hum`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `temp_hum` (
+  `a_id` int(11) NOT NULL AUTO_INCREMENT,
   `id` int(11) DEFAULT NULL,
   `temperature` float DEFAULT NULL,
   `humidity` float DEFAULT NULL,
-  `tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`a_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,6 +85,7 @@ CREATE TABLE `temp_hum` (
 
 LOCK TABLES `temp_hum` WRITE;
 /*!40000 ALTER TABLE `temp_hum` DISABLE KEYS */;
+INSERT INTO `temp_hum` VALUES (1,1,30,60,'10:00'),(2,2,30,60,'10:00'),(3,3,30,60,'10:00'),(4,4,30,60,'10:00');
 /*!40000 ALTER TABLE `temp_hum` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,6 +107,7 @@ CREATE TABLE `total_hum` (
 
 LOCK TABLES `total_hum` WRITE;
 /*!40000 ALTER TABLE `total_hum` DISABLE KEYS */;
+INSERT INTO `total_hum` VALUES (0);
 /*!40000 ALTER TABLE `total_hum` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,7 +131,6 @@ CREATE TABLE `warnings` (
 
 LOCK TABLES `warnings` WRITE;
 /*!40000 ALTER TABLE `warnings` DISABLE KEYS */;
-INSERT INTO `warnings` VALUES (20,70,50);
 /*!40000 ALTER TABLE `warnings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -148,6 +153,7 @@ CREATE TABLE `watering` (
 
 LOCK TABLES `watering` WRITE;
 /*!40000 ALTER TABLE `watering` DISABLE KEYS */;
+INSERT INTO `watering` VALUES (1,0),(2,0),(3,0),(4,0),(5,0),(6,0);
 /*!40000 ALTER TABLE `watering` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -172,7 +178,9 @@ begin
 	set @s = if(@st = 0, 1, 0);
 	
 	update case_8.fork 
-	set state = @s;
+	set state = @s;
+	
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -197,7 +205,8 @@ begin
 	set @s = if(@st = 0, 1, 0);
 	
 	update case_8.total_hum 
-	set state = @s;
+	set state = @s;
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -220,6 +229,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Change_warnings_h`(
 begin
 	update case_8.warnings 
 	set humidity_air = hum;
+
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -242,6 +253,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Change_warnings_hb`(
 begin
 	update case_8.warnings 
 	set humidity_soil = hb;
+
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -264,6 +277,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Change_warnings_temp`(
 begin
 	update case_8.warnings 
 	set temperature = temp;
+
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -290,7 +305,9 @@ begin
 	set @s = if(@st = 0, 1, 0);
 	
 	update case_8.watering 
-	set state = @s;
+	set state = @s
+	where id like p_id;
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -308,11 +325,15 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_fork`()
-begin
+begin
+	set @s = '';
+	select state from case_8.fork f limit 1 into @s;
+	set @st = if(@s = '', 0, '');
 	insert into fork
 	(state)
 	values
-	(0);
+	(@st);
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -335,11 +356,33 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_hum`(
 	tim varchar(8)
 )
 begin
-	insert into case_8.hum 
-	(id, humidity, Tim)
-	values
-	(p_id, hum, tim);
-END ;;
+	set @q = 0;	
+	select COUNT(DISTINCT (a_id)) FROM case_8.hum h into @q;
+	
+	set @a = 0;
+	select a_id into @a from case_8.hum h where id like p_id order by a_id desc limit 1;
+
+	set @w = 0;
+	select id from case_8.hum h where a_id like (@a - 1) into @w;
+
+	set @i = 0;
+	if(@q = 0) then 
+		set @i = 1;
+	elseif p_id <> @w then
+		set @i = 1;
+	else
+		set @i = p_id not in (select id from case_8.hum h);
+	end IF;
+	IF(@i = 1)then
+		insert into case_8.hum 
+		(id, humidity, Tim)
+		values
+		(p_id, hum, tim);
+	end if;
+
+	select 'Ok';
+	
+end ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -362,10 +405,32 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_temp_hum`(
 	tim varchar(8)
 )
 begin
-	insert into case_8.temp_hum 
-	(id, temperature, humidity, tim)
-	values
-	(p_id, temp, hum, tim);
+	set @q = 0;	
+	select COUNT(DISTINCT (id)) FROM case_8.temp_hum th into @q;
+
+	set @a = 0;
+	select a_id into @a from case_8.temp_hum th where id like p_id order by a_id desc limit 1;
+
+	set @w = 0;
+	select id from case_8.temp_hum th where a_id like (@a - 1) into @w;
+
+	set @i = 0;
+	if(@q = 0) then 
+		set @i = 1;
+	elseif p_id <> @w then
+		set @i = 1;
+	else
+		set @i = p_id not in (select id from case_8.temp_hum th);
+	end IF;
+	IF(@i = 1)then
+		insert into case_8.temp_hum 
+		(id, temperature, humidity, tim)
+		values
+		(p_id, temp, hum, tim);
+	end if;
+	
+	select 'Ok';
+	
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -383,11 +448,17 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'IGNORE_SPACE,STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_total_hum`()
-begin
+begin
+	set @s = '';
+	select state from case_8.total_hum th limit 1 into @s;
+	set @st = if(@s = '', 0, '');
+
 	insert into case_8.total_hum 
 	(state)
 	values
-	(0);
+	(@st);
+
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -406,11 +477,23 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_warnings`()
 begin
-	
+	set @t = '';
+	select temperature from case_8.warnings w limit 1 into @t;
+	set @tem = if(@t = '', 20.0, '');
+
+	set @h = '';
+	select humidity_air from case_8.warnings w limit 1 into @h;
+	set @hum = if(@h = '', 70.0, '');
+
+	set @hh = '';
+	select humidity_soil from case_8.warnings w limit 1 into @hh;
+	set @hb = if(@hh = '', 50.0, '');
+	
 	insert into case_8.warnings 
 	(temperature, humidity_air, humidity_soil)
 	values
-	(20.0, 70.0, 50.0);
+	(@tem, @hum, @hb);
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -431,10 +514,16 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Create_watering`(
 	p_id int
 )
 begin
-	insert into case_8.watering 
-	(id, state)
-	values
-	(p_id, 0);
+	set @q = 0;	
+	select COUNT(DISTINCT (id)) FROM case_8.watering into @q;
+	set @i = if(@q = 0, 1, p_id not in (select id from case_8.watering w));
+	IF(@i = 1)then
+		insert into case_8.watering 
+		(id, state)
+		values
+		(p_id, 0);
+	end if;
+	select 'Ok';
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -453,7 +542,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Get_fork`()
 begin
-	select * from case_8.fork;
+	select state from case_8.fork;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -474,7 +563,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Get_hum`(
 	p_id int
 )
 BEGIN
-	select * from case_8.hum where id = p_id;
+	select * from case_8.hum where id = p_id order by a_id desc limit 5;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -514,7 +603,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `Get_hum_temp`(
 	p_id int
 )
 begin
-	select * from case_8.temp_hum where id like p_id;
+	select * from case_8.temp_hum where id like p_id order by a_id desc limit 5;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -533,7 +622,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Get_temp_from_temp_hum`()
 begin
-	select humidity from case_8.temp_hum;
+	select temperature from case_8.temp_hum;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -609,4 +698,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-16 11:03:48
+-- Dump completed on 2023-01-23 14:19:30

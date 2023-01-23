@@ -86,8 +86,8 @@ def change_total_hum():
 
 
 @app.put("/change_watering/{id}", status_code=200)
-def change_watering(ids: int):
-    db.change_watering(id=ids)
+def change_watering(id: int):
+    db.change_watering(id=id)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
 
 
@@ -118,8 +118,8 @@ def get_fork():
 
 
 @app.get("/get_hum/{id}")
-def get_hum(ids: int):
-    return List_Temperature_Humidity(temp_hums=db.get_hum(hum_id=ids))
+def get_hum(id: int):
+    return List_Temperature_Humidity(temp_hums=db.get_hum(hum_id=id))
 
 
 @app.get("/get_average_temperature")
@@ -170,8 +170,8 @@ def get_average_humidity():
 
 
 @app.get("/get_hum_temp/{id}")
-def get_hum_temp(ids: int):
-    return List_Temperature_Humidity(temp_hums=db.get_hum_temp(id=ids))
+def get_hum_temp(id: int):
+    return List_Temperature_Humidity(temp_hums=db.get_hum_temp(id=id))
 
 
 @app.get("/get_total_hum")
@@ -185,8 +185,8 @@ def get_warnings():
 
 
 @app.get("/get_watering/{id}")
-def get_watering(ids: int):
-    return db.get_watering(id=ids)
+def get_watering(id: int):
+    return db.get_watering(id=id)
 
 
 if __name__ == '__main__':
