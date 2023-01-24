@@ -76,7 +76,7 @@ CREATE TABLE `temp_hum` (
   `humidity` float DEFAULT NULL,
   `tim` varchar(8) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`a_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -85,7 +85,7 @@ CREATE TABLE `temp_hum` (
 
 LOCK TABLES `temp_hum` WRITE;
 /*!40000 ALTER TABLE `temp_hum` DISABLE KEYS */;
-INSERT INTO `temp_hum` VALUES (1,1,30,60,'10:00'),(2,2,30,60,'10:00'),(3,3,30,60,'10:00'),(4,4,30,60,'10:00');
+INSERT INTO `temp_hum` VALUES (1,1,30,60,'10:00'),(2,2,30,60,'10:00'),(3,3,30,60,'10:00'),(4,4,30,60,'10:00'),(5,1,28.33,74.51,'12:47'),(6,2,30.03,68.43,'12:47'),(7,3,29.72,53.45,'12:47'),(8,4,29.21,65.8,'12:47'),(9,1,27.82,41.21,'12:47'),(10,2,29.21,64.09,'12:47'),(11,3,28.11,59.23,'12:47'),(12,4,29.39,75.2,'12:47'),(13,1,29.28,68.77,'12:47'),(14,2,31.68,60.96,'12:47'),(15,3,28.05,42.09,'12:47'),(16,4,29.08,75.17,'12:47'),(17,1,26.72,54.09,'12:47'),(18,2,30.22,79.84,'12:47'),(19,3,29.34,73.67,'12:47'),(20,4,29.41,40.19,'12:47'),(21,1,30.26,45.25,'12:47'),(22,2,30.47,69.69,'12:47'),(23,3,30.83,44.76,'12:47'),(24,4,29.94,49.35,'12:47');
 /*!40000 ALTER TABLE `temp_hum` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -582,7 +582,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Get_hum_from_temp_hum`()
 begin
-	select humidity from case_8.temp_hum;
+	select a_id, humidity, tim from case_8.temp_hum order by a_id desc limit 20;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -622,7 +622,7 @@ DELIMITER ;
 DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `Get_temp_from_temp_hum`()
 begin
-	select temperature from case_8.temp_hum;
+	select a_id, temperature, tim from case_8.temp_hum order by a_id desc limit 20;
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -698,4 +698,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-01-23 14:19:30
+-- Dump completed on 2023-01-24 13:13:10

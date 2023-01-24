@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 import time
 import uvicorn as uvicorn
@@ -7,20 +8,14 @@ import requests
 import fastapi
 from fastapi.responses import JSONResponse
 from fastapi import HTTPException, status
-from schemas import Temperature_Humidity, List_Temperature_Humidity, Warnings, Watering
+from schemas import Temperature_Humidity, List_Temperature_Humidity, Warnings, Watering, Average_List, T_H_List
 
 app = fastapi.FastAPI()
 
-token = "" # нужно вставить токен
+token = ""  # нужно вставить токен
 
 
 # ----------------------------------------------------- API POST ----------------------------------------------------- #
-
-
-@app.post("/create_fork", status_code=201)
-def create_fork():
-    db.create_fork()
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created fork")
 
 
 @app.post("/create_hum", status_code=201)
@@ -30,7 +25,7 @@ def create_hum():
     for i in range(1, 7):
         # headers = {"X-Auth-Token": token}
         # request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}", headers=headers)
-        request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}") # тестовая строка
+        request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}")  # тестовая строка
         hum = Temperature_Humidity(**request.json())
         hum.tim = tim
         db.create_hum(temperature_humidity=hum)
@@ -44,30 +39,11 @@ def create_temp_hum():
     for i in range(1, 5):
         # headers = {"X-Auth-Token": token}
         # request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}", headers=headers)
-        request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}") # тестовая строка
+        request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}")  # тестовая строка
         temp_hum = Temperature_Humidity(**request.json())
         temp_hum.tim = tim
         db.create_temp_hum(temperature_humidity=temp_hum)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created temp_hums")
-
-
-@app.post("/create_total_hum", status_code=201)
-def create_total_hum():
-    db.create_total_hum()
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created total_hum")
-
-
-@app.post("/create_watering", status_code=201)
-def create_watering():
-    for i in range(1, 7):
-        db.create_watering(id=i)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created waterings")
-
-
-@app.post("/create_warnings", status_code=201)
-def create_warnings():
-    db.create_warnings()
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created warnings")
 
 
 # ----------------------------------------------------- API PUT ----------------------------------------------------- #
@@ -105,7 +81,7 @@ def change_warnings_h(hum: float):
 
 @app.put("/change_warnings_hb/{humidity_soil}", status_code=200)
 def change_warnings_hb(hum: float):
-    db. change_warnings_hb(humidity_soil=hum)
+    db.change_warnings_hb(humidity_soil=hum)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_hb")
 
 
@@ -117,8 +93,8 @@ def get_fork():
     return db.get_fork()
 
 
-@app.get("/get_hum/{id}")
-def get_hum(id: int):
+@app.get("/get_hum_for_table/{id}")
+def get_hum_for_table(id: int):
     return List_Temperature_Humidity(temp_hums=db.get_hum(hum_id=id))
 
 
@@ -133,15 +109,20 @@ def get_average_temperature():
     """
     a = db.get_temp_from_temp_hum()
     t = 0
-    q = []
+    q = Average_List(d_list=[], t_list=[])
     e = 0
+    w = ''
     for i in a:
         if e < 4:
-            t += i
+            t += i.temperature
             e += 1
+            w = i.tim
         if e == 4:
-            q.append(t/e)
+            q.d_list.append(round((t/4), 2))
+            q.t_list.append(w)
             e = 0
+            t = 0
+
     return q
 
 
@@ -157,20 +138,24 @@ def get_average_humidity():
 
     a = db.get_hum_from_temp_hum()
     t = 0
-    q = []
+    q = Average_List(d_list=[], t_list=[])
     e = 0
+    w = ''
     for i in a:
         if e < 4:
-            t += i
+            t += i.humidity
             e += 1
+            w = i.tim
         if e == 4:
-            q.append(t / e)
+            q.d_list.append(round((t/4), 2))
+            q.t_list.append(w)
             e = 0
+            t = 0
     return q
 
 
-@app.get("/get_hum_temp/{id}")
-def get_hum_temp(id: int):
+@app.get("/get_hum_temp_for_table/{id}")
+def get_hum_temp_for_table(id: int):
     return List_Temperature_Humidity(temp_hums=db.get_hum_temp(id=id))
 
 
@@ -189,5 +174,33 @@ def get_watering(id: int):
     return db.get_watering(id=id)
 
 
+@app.get("/get_temp_hum_for_graphics")
+def get_temp_hum_for_graphics():
+    q = []
+    for i in range(1, 5):
+        a = db.get_hum_temp(id=i)[::-1]
+        w = T_H_List(id=i, t_list=[], h_list=[], tim_list=[])
+        for j in a:
+            w.t_list.append(j.temperature)
+            w.h_list.append(j.humidity)
+            w.tim_list.append(j.tim)
+        q.append(w)
+    return q
+
+
+@app.get("/get_hum_for_graphics")
+def get_hum_for_graphics():
+    q = []
+    for i in range(1, 7):
+        a = db.get_hum(hum_id=i)[::-1]
+        w = T_H_List(id=i, h_list=[], tim_list=[])
+        for j in a:
+            w.h_list.append(j.humidity)
+            w.tim_list.append(j.tim)
+        q.append(w)
+    return q
+
+
 if __name__ == '__main__':
+    os.system("python3 updater.py &")
     uvicorn.run("api:app", host="127.0.0.1", port=8000)

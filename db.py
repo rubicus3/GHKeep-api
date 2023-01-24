@@ -19,11 +19,8 @@ def wrapper():
     """
     try:
         conn = mariadb.connect(
-            # user="mike",
             user="root",
             password="INT2201765",
-            # password="jetflash",
-            # password="testpass",
             host="127.0.0.1",
             port=3306,
             database="case_8"
@@ -117,6 +114,11 @@ def create_total_hum():
             stat = x
     conn.close()
     return stat
+
+
+def create_waterings():
+    for i in range(1, 7):
+        create_watering(id=i)
 
 
 def create_watering(**kwargs):
@@ -333,9 +335,8 @@ def get_temp_from_temp_hum():
     cur = conn.cursor()
     cur.execute("CALL Get_temp_from_temp_hum();")
     a = []
-    for i in cur:
-        for x in i:
-            a.append(int(x))
+    for a_id, i, t in cur:
+        a.append(Temperature_Humidity(temperature=i, tim=t))
     conn.close()
     return a
 
@@ -372,9 +373,8 @@ def get_hum_from_temp_hum():
     cur = conn.cursor()
     cur.execute("CALL Get_hum_from_temp_hum();")
     a = []
-    for i in cur:
-        for x in i:
-            a.append(int(x))
+    for a_id, i, t in cur:
+        a.append(Temperature_Humidity(humidity=i, tim=t))
     conn.close()
     return a
 

@@ -35,4 +35,13 @@ class List_Temperature_Humidity(BaseModel):
     temp_hums: List[Temperature_Humidity]
 
 
+class Average_List(BaseModel):
+    d_list: List[float]
+    t_list: List[str]
 
+
+class T_H_List(BaseModel):
+    id: Optional[int]
+    t_list: Optional[list]
+    h_list: Optional[list]
+    tim_list: Optional[list]
