@@ -1,4 +1,5 @@
 import os
+import subprocess
 from typing import Optional
 import time
 import uvicorn as uvicorn
@@ -202,5 +203,5 @@ def get_hum_for_graphics():
 
 
 if __name__ == '__main__':
-    os.system("python3 updater.py &")
+    subprocess.Popen(["python3", "updater.py"])
     uvicorn.run("api:app", host="127.0.0.1", port=8000)
