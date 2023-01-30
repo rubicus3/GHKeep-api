@@ -6,7 +6,7 @@
 from typing import List
 import mariadb
 import sys
-from schemas import Temperature_Humidity, Watering, Warnings
+from schemas import Temperature_Humidity, Watering, Warnings, T_H_List
 
 
 def wrapper():
@@ -282,6 +282,39 @@ def change_warnings_hb(**kwargs):
 
 
 # ------------------------------------------------------ DB GET ------------------------------------------------------ #
+
+
+def get_temp_hum_for_table():
+    """
+
+    """
+    conn = wrapper()
+    cur = conn.cursor()
+    cur.execute("CALL Get_temp_hum_for_table();")
+    a = []
+    b = []
+    for t, h in cur:
+        a.append(t)
+        b.append(h)
+    conn.close()
+    return T_H_List(t_list=(a[::-1]), h_list=(b[::-1]))
+print(get_temp_hum_for_table())
+
+
+
+def get_hum_for_table():
+    """
+
+    """
+    conn = wrapper()
+    cur = conn.cursor()
+    cur.execute("CALL Get_hum_for_table();")
+    a = []
+    for i in cur:
+        for x in i:
+            a.append(x)
+    conn.close()
+    return a[::-1]
 
 
 def get_fork():

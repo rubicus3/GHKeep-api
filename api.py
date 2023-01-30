@@ -94,9 +94,9 @@ def get_fork():
     return db.get_fork()
 
 
-@app.get("/get_hum_for_table/{id}")
-def get_hum_for_table(id: int):
-    return List_Temperature_Humidity(temp_hums=db.get_hum(hum_id=id))
+@app.get("/get_hum_for_table")
+def get_hum_for_table():
+    return T_H_List(h_list=db.get_hum_for_table())
 
 
 @app.get("/get_average_temperature")
@@ -156,8 +156,8 @@ def get_average_humidity():
 
 
 @app.get("/get_hum_temp_for_table/{id}")
-def get_hum_temp_for_table(id: int):
-    return List_Temperature_Humidity(temp_hums=db.get_hum_temp(id=id))
+def get_hum_temp_for_table():
+    return db.get_temp_hum_for_table()
 
 
 @app.get("/get_total_hum")
