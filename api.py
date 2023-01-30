@@ -51,12 +51,16 @@ def create_temp_hum():
 @app.put("/change_fork", status_code=200)
 def change_fork():
     db.change_fork()
+    q = db.get_fork()
+    requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q})
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
 
 
 @app.put("/change_total_hum", status_code=200)
 def change_total_hum():
     db.change_total_hum()
+    q = db.get_total_hum()
+    requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q})
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
 
 
@@ -202,5 +206,4 @@ def get_hum_for_graphics():
 
 if __name__ == '__main__':
     subprocess.Popen(["python3", "updater.py"])
-    uvicorn.run("api:app", host="127.0.0.1", port=8000)
-    # uvicorn.run("api:app", host="0.0.0.0", port=8000)
+    uvicorn.run("api:app", host="0.0.0.0", port=8000)
