@@ -3,10 +3,9 @@
     Модуль для работы с базой данных
 
 """
-from typing import List
 import mariadb
 import sys
-from schemas import Temperature_Humidity, Watering, Warnings, T_H_List
+from schemas import Temperature_Humidity, Warnings, T_H_List
 
 
 def wrapper():
@@ -38,8 +37,6 @@ def create_fork():
     """
 
         Функция для создания форточек
-
-        :param kwargs: состояние форточек
 
     """
     conn = wrapper()
@@ -101,8 +98,6 @@ def create_total_hum():
 
         Функция для создания единой системы увлажнения
 
-        :param kwargs: состояние системы
-
     """
     conn = wrapper()
     conn.autocommit = True
@@ -146,8 +141,6 @@ def create_warnings():
     """
 
         Функция для создания порогов среднего значения значений
-
-        :param kwargs: класс Warnings с: порогами средних значений температуры, влажности воздуха и почвы
 
     """
     conn = wrapper()
@@ -298,8 +291,6 @@ def get_temp_hum_for_table():
         b.append(h)
     conn.close()
     return T_H_List(t_list=(a[::-1]), h_list=(b[::-1]))
-print(get_temp_hum_for_table())
-
 
 
 def get_hum_for_table():
@@ -467,4 +458,3 @@ def get_watering(**kwargs):
             stat = x
     conn.close()
     return stat
-

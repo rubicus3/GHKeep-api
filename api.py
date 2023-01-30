@@ -1,6 +1,4 @@
-import os
 import subprocess
-from typing import Optional
 import time
 import uvicorn as uvicorn
 
@@ -8,8 +6,8 @@ import db
 import requests
 import fastapi
 from fastapi.responses import JSONResponse
-from fastapi import HTTPException, status
-from schemas import Temperature_Humidity, List_Temperature_Humidity, Warnings, Watering, Average_List, T_H_List
+from fastapi import status
+from schemas import Temperature_Humidity, Average_List, T_H_List
 
 app = fastapi.FastAPI()
 
@@ -155,7 +153,7 @@ def get_average_humidity():
     return q
 
 
-@app.get("/get_hum_temp_for_table/{id}")
+@app.get("/get_hum_temp_for_table")
 def get_hum_temp_for_table():
     return db.get_temp_hum_for_table()
 
@@ -205,3 +203,4 @@ def get_hum_for_graphics():
 if __name__ == '__main__':
     subprocess.Popen(["python3", "updater.py"])
     uvicorn.run("api:app", host="127.0.0.1", port=8000)
+    # uvicorn.run("api:app", host="0.0.0.0", port=8000)
