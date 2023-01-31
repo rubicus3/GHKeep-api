@@ -52,7 +52,9 @@ def create_temp_hum():
 def change_fork():
     db.change_fork()
     q = db.get_fork()
-    requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q})
+    global token
+    headers = {"X-Auth-Token": token}
+    requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
 
 
@@ -60,13 +62,20 @@ def change_fork():
 def change_total_hum():
     db.change_total_hum()
     q = db.get_total_hum()
-    requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q})
+    global token
+    headers = {"X-Auth-Token": token}
+    requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
 
 
 @app.put("/change_watering/{id}", status_code=200)
 def change_watering(id: int):
+
     db.change_watering(id=id)
+    q = db.get_watering(id=id)
+    global token
+    headers = {"X-Auth-Token": token}
+    requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
 
 
@@ -181,7 +190,7 @@ def get_watering(id: int):
 def get_temp_hum_for_graphics():
     q = []
     for i in range(1, 5):
-        a = db.get_hum_temp(id=i)[::-1]
+        a = db.get_hum_temp(id=i)
         w = T_H_List(id=i, t_list=[], h_list=[], tim_list=[])
         for j in a:
             w.t_list.append(j.temperature)
@@ -195,7 +204,7 @@ def get_temp_hum_for_graphics():
 def get_hum_for_graphics():
     q = []
     for i in range(1, 7):
-        a = db.get_hum(hum_id=i)[::-1]
+        a = db.get_hum(hum_id=i)
         w = T_H_List(id=i, h_list=[], tim_list=[])
         for j in a:
             w.h_list.append(j.humidity)
