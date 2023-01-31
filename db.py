@@ -362,7 +362,7 @@ def get_temp_from_temp_hum():
     for a_id, i, t in cur:
         a.append(Temperature_Humidity(temperature=i, tim=t))
     conn.close()
-    return a
+    return a[::-1]
 
 
 def get_hum_temp(**kwargs):
@@ -400,7 +400,7 @@ def get_hum_from_temp_hum():
     for a_id, i, t in cur:
         a.append(Temperature_Humidity(humidity=i, tim=t))
     conn.close()
-    return a
+    return a[::-1]
 
 
 def get_total_hum():
