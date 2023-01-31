@@ -303,7 +303,7 @@ def get_hum_for_table():
     a = []
     for i in cur:
         for x in i:
-            a.append(x)
+            a.append(int(x))
     conn.close()
     return a[::-1]
 
