@@ -7,7 +7,7 @@ import requests
 import fastapi
 from fastapi.responses import JSONResponse
 from fastapi import status
-from schemas import Temperature_Humidity, Average_List, T_H_List
+from schemas import Temperature_Humidity, Average_List, T_H_List, Soil_Warnings
 
 app = fastapi.FastAPI()
 
@@ -91,9 +91,9 @@ def change_warnings_h(hum: float):
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_h")
 
 
-@app.put("/change_warnings_hb/{humidity_soil}", status_code=200)
-def change_warnings_hb(hum: float):
-    db.change_warnings_hb(humidity_soil=hum)
+@app.put("/change_warnings_hb/{id}/", status_code=200)
+def change_warnings_hb(id: int, humidity_soil: float):
+    db.change_warnings_hb(soil_warn=Soil_Warnings(id=id, hb=humidity_soil))
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_hb")
 
 
@@ -211,6 +211,11 @@ def get_hum_for_graphics():
             w.tim_list.append(j.tim)
         q.append(w)
     return q
+
+
+@app.get("/get_soil_warnings/{id}")
+def get_soil_warnings(id: int):
+    return db.get_soil_warnings(id=id)
 
 
 if __name__ == '__main__':

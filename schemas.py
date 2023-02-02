@@ -24,11 +24,12 @@ class Watering(BaseModel):
 
 class Warnings(BaseModel):
     """
-        Класс для порогов средних значений
+
+        Класс для порогов средних значений воздуха
+
     """
     temperature: Optional[int]
     humidity_air: Optional[int]
-    humidity_soil: Optional[int]
 
 
 class List_Temperature_Humidity(BaseModel):
@@ -45,3 +46,14 @@ class T_H_List(BaseModel):
     t_list: Optional[list]
     h_list: Optional[list]
     tim_list: Optional[list]
+
+
+class Soil_Warnings(BaseModel):
+    """
+
+            Класс для порогов средних значений почвы
+
+    """
+
+    id: Optional[int]
+    hb: Optional[float]

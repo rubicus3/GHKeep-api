@@ -1,5 +1,5 @@
 import db
-from schemas import Warnings, Temperature_Humidity
+from schemas import Warnings, Temperature_Humidity, Soil_Warnings
 
 
 # ----------------------------------------------------Create py-tests--------------------------------------------------#
@@ -35,10 +35,6 @@ def test_create_watering():
     assert q == 'Ok'
 
 
-def test_create_warnings():
-    assert db.create_warnings() == 'Ok'
-
-
 # ----------------------------------------------------Get py-tests-----------------------------------------------------#
 
 
@@ -67,7 +63,7 @@ def test_get_total_hum():
 
 
 def test_get_warnings():
-    assert db.get_warnings() == Warnings(temperature=20.0, humidity_air=70.0, humidity_soil=50.0)
+    assert db.get_warnings() == Warnings(temperature=20.0, humidity_air=70.0)
 
 
 def test_get_watering():
@@ -101,4 +97,4 @@ def test_change_warnings_h():
 
 
 def test_change_warnings_hb():
-    assert db.change_warnings_hb(humidity_soil=30.0) == 'Ok'
+    assert db.change_warnings_hb(soil_warn=Soil_Warnings(id=1, hb=70.0)) == 'Ok'

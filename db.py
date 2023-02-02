@@ -5,7 +5,7 @@
 """
 import mariadb
 import sys
-from schemas import Temperature_Humidity, Warnings, T_H_List
+from schemas import Temperature_Humidity, Warnings, T_H_List, Soil_Warnings
 
 
 def wrapper():
@@ -137,24 +137,6 @@ def create_watering(**kwargs):
     return stat
 
 
-def create_warnings():
-    """
-
-        Функция для создания порогов среднего значения значений
-
-    """
-    conn = wrapper()
-    conn.autocommit = True
-    cur = conn.cursor()
-    cur.execute("CALL Create_warnings();")
-    stat = ''
-    for i in cur:
-        for x in i:
-            stat = x
-    conn.close()
-    return stat
-
-
 # ------------------------------------------------------ DB PUT ------------------------------------------------------ #
 
 
@@ -265,7 +247,8 @@ def change_warnings_hb(**kwargs):
     conn = wrapper()
     conn.autocommit = True
     cur = conn.cursor()
-    cur.execute("CALL Change_warnings_hb(?)", (kwargs["humidity_soil"],))
+    a: Soil_Warnings = kwargs['soil_warn']
+    cur.execute("CALL Change_warnings_hb(?,? )", (a.id, a.hb))
     stat = ''
     for i in cur:
         for x in i:
@@ -433,8 +416,8 @@ def get_warnings():
     cur = conn.cursor()
     cur.execute("CALL Get_warnings();")
     a = ''
-    for temp, hum, hd in cur:
-        a = Warnings(temperature=temp, humidity_air=hum, humidity_soil=hd)
+    for temp, hum in cur:
+        a = Warnings(temperature=temp, humidity_air=hum)
     conn.close()
     return a
 
@@ -458,3 +441,16 @@ def get_watering(**kwargs):
             stat = x
     conn.close()
     return stat
+
+
+def get_soil_warnings(**kwargs):
+    """
+
+    """
+    conn = wrapper()
+    cur = conn.cursor()
+    cur.execute("CALL Get_soil_warnings(?)", (kwargs['id'],))
+    a = ''
+    for i, h in cur:
+        a = Soil_Warnings(id=i, hb=h)
+    return a
