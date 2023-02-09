@@ -16,33 +16,33 @@ token = ""  # нужно вставить токен
 
 # ----------------------------------------------------- API POST ----------------------------------------------------- #
 
-
-@app.post("/create_hum", status_code=201)
-def create_hum():
-    tim = time.strftime("%H:%M")
-    global token
-    for i in range(1, 7):
-        # headers = {"X-Auth-Token": token}
-        # request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}", headers=headers)
-        request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}")  # тестовая строка
-        hum = Temperature_Humidity(**request.json())
-        hum.tim = tim
-        db.create_hum(temperature_humidity=hum)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created hums")
-
-
-@app.post("/create_temp_hum", status_code=201)
-def create_temp_hum():
-    tim = time.strftime("%H:%M")
-    global token
-    for i in range(1, 5):
-        # headers = {"X-Auth-Token": token}
-        # request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}", headers=headers)
-        request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}")  # тестовая строка
-        temp_hum = Temperature_Humidity(**request.json())
-        temp_hum.tim = tim
-        db.create_temp_hum(temperature_humidity=temp_hum)
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created temp_hums")
+#
+# @app.post("/create_hum", status_code=201)
+# def create_hum():
+#     tim = time.strftime("%H:%M")
+#     global token
+#     for i in range(1, 7):
+#         # headers = {"X-Auth-Token": token}
+#         # request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}", headers=headers)
+#         request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{i}")  # тестовая строка
+#         hum = Temperature_Humidity(**request.json())
+#         hum.tim = tim
+#         db.create_hum(temperature_humidity=hum)
+#     return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created hums")
+#
+#
+# @app.post("/create_temp_hum", status_code=201)
+# def create_temp_hum():
+#     tim = time.strftime("%H:%M")
+#     global token
+#     for i in range(1, 5):
+#         # headers = {"X-Auth-Token": token}
+#         # request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}", headers=headers)
+#         request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}")  # тестовая строка
+#         temp_hum = Temperature_Humidity(**request.json())
+#         temp_hum.tim = tim
+#         db.create_temp_hum(temperature_humidity=temp_hum)
+#     return JSONResponse(status_code=status.HTTP_201_CREATED, content="Created temp_hums")
 
 
 # ----------------------------------------------------- API PUT ----------------------------------------------------- #
@@ -81,19 +81,34 @@ def change_watering(id: int):
 
 @app.put("/change_warnings_temp/{temperature}", status_code=200)
 def change_warnings_temp(temp: float):
-    db.change_warnings_temp(temperature=temp)
+    if temp < 0:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
+    if temp > 100:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is greater than allowed values")
+    else:
+        db.change_warnings_temp(temperature=temp)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_temp")
 
 
 @app.put("/change_warnings_h/{humidity_air}", status_code=200)
 def change_warnings_h(hum: float):
-    db.change_warnings_h(humidity_air=hum)
+    if hum < 0:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
+    if hum > 100:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is greater than allowed values")
+    else:
+        db.change_warnings_h(humidity_air=hum)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_h")
 
 
 @app.put("/change_warnings_hb/{id}/", status_code=200)
 def change_warnings_hb(id: int, humidity_soil: float):
-    db.change_warnings_hb(soil_warn=Soil_Warnings(id=id, hb=humidity_soil))
+    if humidity_soil < 0:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
+    if humidity_soil > 100:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is greater than allowed values")
+    else:
+        db.change_warnings_hb(soil_warn=Soil_Warnings(id=id, hb=humidity_soil))
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_hb")
 
 
