@@ -48,55 +48,76 @@ token = ""  # нужно вставить токен
 # ----------------------------------------------------- API PUT ----------------------------------------------------- #
 
 
-@app.put("/change_fork", status_code=200)
-def change_fork():
-    a = db.get_temp_from_temp_hum()[-4::]
-    e = 0
-    for i in a:
-        e += i.temperature
-    e //= 4
-    w = db.get_warnings()
-    if e > w.temperature:
+@app.put("/change_fork/{extra}", status_code=200)
+def change_fork(extra: bool):
+    global token
+    if not extra:
+        a = db.get_temp_from_temp_hum()[-4::]
+        e = 0
+        for i in a:
+            e += i.temperature
+        e //= 4
+        w = db.get_warnings()
+        if e > w.temperature:
+            db.change_fork()
+            q = db.get_fork()
+            headers = {"X-Auth-Token": token}
+            requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
+            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
+    else:
         db.change_fork()
         q = db.get_fork()
-        global token
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
 
 
-@app.put("/change_total_hum", status_code=200)
-def change_total_hum():
-    a = db.get_hum_from_temp_hum()[-4::]
-    e = 0
-    for i in a:
-        e += i.humidity
-    e //= 4
-    w = db.get_warnings()
-    if e < w.humidity_air:
+@app.put("/change_total_hum/{extra}", status_code=200)
+def change_total_hum(extra: bool):
+    global token
+    if not extra:
+        a = db.get_hum_from_temp_hum()[-4::]
+        e = 0
+        for i in a:
+            e += i.humidity
+        e //= 4
+        w = db.get_warnings()
+        if e < w.humidity_air:
+            db.change_total_hum()
+            q = db.get_total_hum()
+            headers = {"X-Auth-Token": token}
+            requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
+            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
+    else:
         db.change_total_hum()
         q = db.get_total_hum()
-        global token
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
 
 
-@app.put("/change_watering/{id}", status_code=200)
-def change_watering(id: int):
-    a = db.get_hum_for_table()
-    w = a[id-1]
-    e = db.get_soil_warnings(id=id)
-    if w < e.hb:
+@app.put("/change_watering/{id}/{extra}", status_code=200)
+def change_watering(id: int, extra: bool):
+    global token
+    if not extra:
+        a = db.get_hum_for_table()
+        w = a[id-1]
+        e = db.get_soil_warnings(id=id)
+        if w < e.hb:
+            db.change_watering(id=id)
+            q = db.get_watering(id=id)
+            headers = {"X-Auth-Token": token}
+            requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
+            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
+    else:
         db.change_watering(id=id)
         q = db.get_watering(id=id)
-        global token
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
 
 
 @app.put("/change_warnings_temp/{temperature}", status_code=200)
@@ -135,14 +156,41 @@ def change_warnings_hb(id: int, humidity_soil: float):
 # ----------------------------------------------------- API GET ----------------------------------------------------- #
 
 
-@app.get("/get_fork")
-def get_fork():
-    return db.get_fork()
+@app.get("/get_hum_temp_for_table")
+def get_hum_temp_for_table():
+    return db.get_temp_hum_for_table()
 
 
 @app.get("/get_hum_for_table")
 def get_hum_for_table():
     return T_H_List(h_list=db.get_hum_for_table())
+
+
+@app.get("/get_temp_hum_for_graphics")
+def get_temp_hum_for_graphics():
+    q = []
+    for i in range(1, 5):
+        a = db.get_hum_temp(id=i)
+        w = T_H_List(id=i, t_list=[], h_list=[], tim_list=[])
+        for j in a:
+            w.t_list.append(j.temperature)
+            w.h_list.append(j.humidity)
+            w.tim_list.append(j.tim)
+        q.append(w)
+    return q
+
+
+@app.get("/get_hum_for_graphics")
+def get_hum_for_graphics():
+    q = []
+    for i in range(1, 7):
+        a = db.get_hum(hum_id=i)
+        w = T_H_List(id=i, h_list=[], tim_list=[])
+        for j in a:
+            w.h_list.append(j.humidity)
+            w.tim_list.append(j.tim)
+        q.append(w)
+    return q
 
 
 @app.get("/get_average_temperature")
@@ -182,7 +230,6 @@ def get_average_humidity():
         :return: список со значениями средней влажности воздуха
 
     """
-
     a = db.get_hum_from_temp_hum()
     t = 0
     q = Average_List(d_list=[], t_list=[])
@@ -201,14 +248,19 @@ def get_average_humidity():
     return q
 
 
-@app.get("/get_hum_temp_for_table")
-def get_hum_temp_for_table():
-    return db.get_temp_hum_for_table()
+@app.get("/get_fork")
+def get_fork():
+    return db.get_fork()
 
 
 @app.get("/get_total_hum")
 def get_total_hum():
     return db.get_total_hum()
+
+
+@app.get("/get_watering/{id}")
+def get_watering(id: int):
+    return db.get_watering(id=id)
 
 
 @app.get("/get_warnings")
@@ -220,38 +272,6 @@ def get_warnings():
     return {"temperature": q.temperature,
             "humidity_air": q.humidity_air,
             "humidity_soil": w}
-
-
-@app.get("/get_watering/{id}")
-def get_watering(id: int):
-    return db.get_watering(id=id)
-
-
-@app.get("/get_temp_hum_for_graphics")
-def get_temp_hum_for_graphics():
-    q = []
-    for i in range(1, 5):
-        a = db.get_hum_temp(id=i)
-        w = T_H_List(id=i, t_list=[], h_list=[], tim_list=[])
-        for j in a:
-            w.t_list.append(j.temperature)
-            w.h_list.append(j.humidity)
-            w.tim_list.append(j.tim)
-        q.append(w)
-    return q
-
-
-@app.get("/get_hum_for_graphics")
-def get_hum_for_graphics():
-    q = []
-    for i in range(1, 7):
-        a = db.get_hum(hum_id=i)
-        w = T_H_List(id=i, h_list=[], tim_list=[])
-        for j in a:
-            w.h_list.append(j.humidity)
-            w.tim_list.append(j.tim)
-        q.append(w)
-    return q
 
 
 # @app.get("/get_soil_warnings/{id}")

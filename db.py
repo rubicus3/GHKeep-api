@@ -17,9 +17,13 @@ def wrapper():
 
     """
     try:
+        q = []
+        with open('mariadb_password') as file:
+            q = file.read().split()
+
         conn = mariadb.connect(
             user="root",
-            password="INT2201765",
+            password=q[0],
             host="127.0.0.1",
             port=3306,
             database="case_8"
