@@ -81,7 +81,7 @@ def change_total_hum():
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not exceed the permissible value")
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
 
 
 @app.put("/change_watering/{id}", status_code=200)
@@ -96,7 +96,7 @@ def change_watering(id: int):
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
-    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not exceed the permissible value")
+    return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
 
 
 @app.put("/change_warnings_temp/{temperature}", status_code=200)
