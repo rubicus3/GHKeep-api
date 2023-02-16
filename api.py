@@ -74,7 +74,7 @@ def change_total_hum():
         e += i.humidity
     e //= 4
     w = db.get_warnings()
-    if e > w.humidity_air:
+    if e < w.humidity_air:
         db.change_total_hum()
         q = db.get_total_hum()
         global token
@@ -89,7 +89,7 @@ def change_watering(id: int):
     a = db.get_hum_for_table()
     w = a[id-1]
     e = db.get_soil_warnings(id=id)
-    if w > e.hb:
+    if w < e.hb:
         db.change_watering(id=id)
         q = db.get_watering(id=id)
         global token
