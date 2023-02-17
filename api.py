@@ -63,9 +63,9 @@ def change_fork(extra: bool):
             e = 0
             for i in a:
                 e += i.temperature
-            e //= 4
+            e /= 4
             w = db.get_warnings()
-            if e > w.temperature:
+            if float(e) > float(w.temperature):
                 db.change_fork()
                 q = db.get_fork()
                 headers = {"X-Auth-Token": token}
@@ -95,9 +95,9 @@ def change_total_hum(extra: bool):
             e = 0
             for i in a:
                 e += i.humidity
-            e //= 4
+            e /= 4
             w = db.get_warnings()
-            if e < w.humidity_air:
+            if float(e) < float(w.humidity_air):
                 db.change_total_hum()
                 q = db.get_total_hum()
                 headers = {"X-Auth-Token": token}
@@ -126,7 +126,7 @@ def change_watering(id: int, extra: bool):
             a = db.get_hum_for_table()
             w = a[id-1]
             e = db.get_soil_warnings(id=id)
-            if w < e.hb:
+            if float(w) < float(e.hb):
                 db.change_watering(id=id)
                 q = db.get_watering(id=id)
                 headers = {"X-Auth-Token": token}
