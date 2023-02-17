@@ -51,73 +51,94 @@ token = ""  # нужно вставить токен
 @app.put("/change_fork/{extra}", status_code=200)
 def change_fork(extra: bool):
     global token
-    if not extra:
-        a = db.get_temp_from_temp_hum()[-4::]
-        e = 0
-        for i in a:
-            e += i.temperature
-        e //= 4
-        w = db.get_warnings()
-        if e > w.temperature:
-            db.change_fork()
-            q = db.get_fork()
-            headers = {"X-Auth-Token": token}
-            requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
-            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
-    else:
+    if db.get_fork():
         db.change_fork()
         q = db.get_fork()
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
+    else:
+        if not extra:
+            a = db.get_temp_from_temp_hum()[-4::]
+            e = 0
+            for i in a:
+                e += i.temperature
+            e //= 4
+            w = db.get_warnings()
+            if e > w.temperature:
+                db.change_fork()
+                q = db.get_fork()
+                headers = {"X-Auth-Token": token}
+                requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
+                return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
+        else:
+            db.change_fork()
+            q = db.get_fork()
+            headers = {"X-Auth-Token": token}
+            requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": q}, headers=headers)
+            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
 
 
 @app.put("/change_total_hum/{extra}", status_code=200)
 def change_total_hum(extra: bool):
     global token
-    if not extra:
-        a = db.get_hum_from_temp_hum()[-4::]
-        e = 0
-        for i in a:
-            e += i.humidity
-        e //= 4
-        w = db.get_warnings()
-        if e < w.humidity_air:
-            db.change_total_hum()
-            q = db.get_total_hum()
-            headers = {"X-Auth-Token": token}
-            requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
-            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
-    else:
+    if db.get_total_hum():
         db.change_total_hum()
         q = db.get_total_hum()
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
+    else:
+        if not extra:
+            a = db.get_hum_from_temp_hum()[-4::]
+            e = 0
+            for i in a:
+                e += i.humidity
+            e //= 4
+            w = db.get_warnings()
+            if e < w.humidity_air:
+                db.change_total_hum()
+                q = db.get_total_hum()
+                headers = {"X-Auth-Token": token}
+                requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
+                return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
+        else:
+            db.change_total_hum()
+            q = db.get_total_hum()
+            headers = {"X-Auth-Token": token}
+            requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": q}, headers=headers)
+            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
 
 
 @app.put("/change_watering/{id}/{extra}", status_code=200)
 def change_watering(id: int, extra: bool):
     global token
-    if not extra:
-        a = db.get_hum_for_table()
-        w = a[id-1]
-        e = db.get_soil_warnings(id=id)
-        if w < e.hb:
-            db.change_watering(id=id)
-            q = db.get_watering(id=id)
-            headers = {"X-Auth-Token": token}
-            requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
-            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
-    else:
+    if db.get_watering(id=id):
         db.change_watering(id=id)
         q = db.get_watering(id=id)
         headers = {"X-Auth-Token": token}
         requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
+    else:
+        if not extra:
+            a = db.get_hum_for_table()
+            w = a[id-1]
+            e = db.get_soil_warnings(id=id)
+            if w < e.hb:
+                db.change_watering(id=id)
+                q = db.get_watering(id=id)
+                headers = {"X-Auth-Token": token}
+                requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
+                return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
+        else:
+            db.change_watering(id=id)
+            q = db.get_watering(id=id)
+            headers = {"X-Auth-Token": token}
+            requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": q}, headers=headers)
+            return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
 
 
 @app.put("/change_warnings_temp/{temperature}", status_code=200)
