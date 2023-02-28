@@ -24,7 +24,7 @@ def create():
             db.create_hum(temperature_humidity=hum)
 
 
-while True:
-
-    time.sleep(60)
-    create()
+if __name__ == '__main__':
+    while True:
+        time.sleep(60)
+        create()
