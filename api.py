@@ -11,24 +11,23 @@ import db
 import requests
 import fastapi
 from fastapi.responses import JSONResponse
-from fastapi import status
+from fastapi import status, Header
 from schemas import Average_List, T_H_List, Soil_Warnings
+from constants import token as secret_token
 
 app = fastapi.FastAPI()
-
-token = ""  # нужно вставить токен
 
 
 # ----------------------------------------------------- API PUT ----------------------------------------------------- #
 
 
 @app.put("/change_fork_state/{extra}", status_code=200)
-def change_fork_state(extra: bool):
-    global token
+def change_fork_state(extra: bool, token: str = Header(default=None)):
+    if token != secret_token:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_fork():
         db.change_fork()
         state = db.get_fork()
-        # headers = {"X-Auth-Token": token}
         requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
     else:
@@ -42,25 +41,23 @@ def change_fork_state(extra: bool):
             if float(num) > float(warnings.temperature):
                 db.change_fork()
                 state = db.get_fork()
-                # headers = {"X-Auth-Token": token}
                 requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
         else:
             db.change_fork()
             state = db.get_fork()
-            # headers = {"X-Auth-Token": token}
             requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
 
 
 @app.put("/change_total_hum_state/{extra}", status_code=200)
-def change_total_hum_state(extra: bool):
-    global token
+def change_total_hum_state(extra: bool, token: str = Header(default=None)):
+    if token != secret_token:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_total_hum():
         db.change_total_hum()
         state = db.get_total_hum()
-        # headers = {"X-Auth-Token": token}
         requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
     else:
@@ -74,25 +71,23 @@ def change_total_hum_state(extra: bool):
             if float(num) < float(warnings.humidity_air):
                 db.change_total_hum()
                 state = db.get_total_hum()
-                # headers = {"X-Auth-Token": token}
                 requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
         else:
             db.change_total_hum()
             state = db.get_total_hum()
-            # headers = {"X-Auth-Token": token}
             requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
 
 
 @app.put("/change_watering_system_state/{id}/{extra}", status_code=200)
-def change_watering_system_state(id: int, extra: bool):
-    global token
+def change_watering_system_state(id: int, extra: bool, token: str = Header(default=None)):
+    if token != secret_token:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_watering(id=id):
         db.change_watering(id=id)
         state = db.get_watering(id=id)
-        # headers = {"X-Auth-Token": token}
         requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
     else:
@@ -103,20 +98,20 @@ def change_watering_system_state(id: int, extra: bool):
             if float(sensor_states) < float(warnings.hb):
                 db.change_watering(id=id)
                 state = db.get_watering(id=id)
-                # headers = {"X-Auth-Token": token}
                 requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
         else:
             db.change_watering(id=id)
             state = db.get_watering(id=id)
-            # headers = {"X-Auth-Token": token}
             requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
 
 
 @app.put("/change_temperature_warnings/{temperature}", status_code=200)
-def change_temperature_warnings(temperature: float):
+def change_temperature_warnings(temperature: float, token: str = Header(default=None)):
+    if token != secret_token:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if temperature < 0:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
     if temperature > 100:
@@ -127,7 +122,9 @@ def change_temperature_warnings(temperature: float):
 
 
 @app.put("/change_humidity_air_warnings/{humidity_air}", status_code=200)
-def change_humidity_air_warnings(humidity_air: float):
+def change_humidity_air_warnings(humidity_air: float, token: str = Header(default=None)):
+    if token != secret_token:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if humidity_air < 0:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
     if humidity_air > 100:
@@ -138,7 +135,9 @@ def change_humidity_air_warnings(humidity_air: float):
 
 
 @app.put("/change_humidity_soil_warnings/{id}/{humidity_soil}", status_code=200)
-def change_humidity_soil_warnings(id: int, humidity_soil: float):
+def change_humidity_soil_warnings(id: int, humidity_soil: float, token: str = Header(default=None)):
+    if token != secret_token:
+        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if humidity_soil < 0:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
     if humidity_soil > 100:

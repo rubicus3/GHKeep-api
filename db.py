@@ -6,7 +6,7 @@
 import mariadb
 import sys
 from schemas import Temperature_Humidity, Warnings, T_H_List, Soil_Warnings
-
+from constants import mariadb_password
 
 def wrapper():
     """
@@ -17,13 +17,9 @@ def wrapper():
 
     """
     try:
-        q = []
-        with open('mariadb_password') as file:
-            q = file.read().split()
-
         conn = mariadb.connect(
             user="root",
-            password=q[0],
+            password=mariadb_password,
             host="127.0.0.1",
             port=3306,
             database="case_8"
