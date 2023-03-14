@@ -28,8 +28,8 @@ def change_fork_state(extra: bool):
     if db.get_fork():
         db.change_fork()
         state = db.get_fork()
-        headers = {"X-Auth-Token": token}
-        requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": state}, headers=headers)
+        # headers = {"X-Auth-Token": token}
+        requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
     else:
         if not extra:
@@ -42,15 +42,15 @@ def change_fork_state(extra: bool):
             if float(num) > float(warnings.temperature):
                 db.change_fork()
                 state = db.get_fork()
-                headers = {"X-Auth-Token": token}
-                requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": state}, headers=headers)
+                # headers = {"X-Auth-Token": token}
+                requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
         else:
             db.change_fork()
             state = db.get_fork()
-            headers = {"X-Auth-Token": token}
-            requests.patch("https://dt.miet.ru/ppo_it/api/fork_drive/ ", {"state": state}, headers=headers)
+            # headers = {"X-Auth-Token": token}
+            requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
 
 
@@ -60,8 +60,8 @@ def change_total_hum_state(extra: bool):
     if db.get_total_hum():
         db.change_total_hum()
         state = db.get_total_hum()
-        headers = {"X-Auth-Token": token}
-        requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": state}, headers=headers)
+        # headers = {"X-Auth-Token": token}
+        requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
     else:
         if not extra:
@@ -74,15 +74,15 @@ def change_total_hum_state(extra: bool):
             if float(num) < float(warnings.humidity_air):
                 db.change_total_hum()
                 state = db.get_total_hum()
-                headers = {"X-Auth-Token": token}
-                requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": state}, headers=headers)
+                # headers = {"X-Auth-Token": token}
+                requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
         else:
             db.change_total_hum()
             state = db.get_total_hum()
-            headers = {"X-Auth-Token": token}
-            requests.patch("https://dt.miet.ru/ppo_it/api/total_hum", {"state": state}, headers=headers)
+            # headers = {"X-Auth-Token": token}
+            requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
 
 
@@ -92,8 +92,8 @@ def change_watering_system_state(id: int, extra: bool):
     if db.get_watering(id=id):
         db.change_watering(id=id)
         state = db.get_watering(id=id)
-        headers = {"X-Auth-Token": token}
-        requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": state}, headers=headers)
+        # headers = {"X-Auth-Token": token}
+        requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
     else:
         if not extra:
@@ -103,15 +103,15 @@ def change_watering_system_state(id: int, extra: bool):
             if float(sensor_states) < float(warnings.hb):
                 db.change_watering(id=id)
                 state = db.get_watering(id=id)
-                headers = {"X-Auth-Token": token}
-                requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": state}, headers=headers)
+                # headers = {"X-Auth-Token": token}
+                requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
         else:
             db.change_watering(id=id)
             state = db.get_watering(id=id)
-            headers = {"X-Auth-Token": token}
-            requests.patch("https://dt.miet.ru/ppo_it/api/watering", {"id": id, "state": state}, headers=headers)
+            # headers = {"X-Auth-Token": token}
+            requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
 
 
