@@ -140,7 +140,7 @@ def create_watering(**kwargs):
 # ------------------------------------------------------ DB PUT ------------------------------------------------------ #
 
 
-def change_fork():
+def change_fork_state():
     """
 
         Функция для изменения состояния форточек
@@ -158,7 +158,7 @@ def change_fork():
     return stat
 
 
-def change_total_hum():
+def change_total_hum_state():
     """
 
         Функция для изменения состояния единой системы увлажнения
@@ -176,7 +176,7 @@ def change_total_hum():
     return stat
 
 
-def change_watering(**kwargs):
+def change_watering_state(**kwargs):
     """
 
         Функция для изменения состояния одной из систем полива
@@ -196,7 +196,7 @@ def change_watering(**kwargs):
     return stat
 
 
-def change_warnings_temp(**kwargs):
+def change_warnings_temperature(**kwargs):
     """
 
         Функция для изменения порога среднего значения температуры
@@ -216,7 +216,7 @@ def change_warnings_temp(**kwargs):
     return stat
 
 
-def change_warnings_h(**kwargs):
+def change_warnings_humidity_air(**kwargs):
     """
 
         Функция для изменения порога среднего значения влажности воздуха
@@ -236,7 +236,7 @@ def change_warnings_h(**kwargs):
     return stat
 
 
-def change_warnings_hb(**kwargs):
+def change_warnings_humidity_soil(**kwargs):
     """
 
         Функция для изменения порога среднего значения влажности почвы
@@ -310,7 +310,7 @@ def get_fork():
     return stat
 
 
-def get_hum(**kwargs):
+def get_hum_soil(**kwargs):
     """
 
         Функция для получения данных с датчика почвы
@@ -325,7 +325,7 @@ def get_hum(**kwargs):
     cur.execute("CALL Get_hum(?)", (kwargs["hum_id"],))
     a = []
     for a_id, p_id, humidity, tim in cur:
-        a.append(Temperature_Humidity(id=p_id, humidity=humidity, tim=tim))
+        a.append(Temperature_Humidity(id=p_id, humidity=round(humidity, 2), tim=tim))
     conn.close()
     return a[::-1]
 
@@ -363,7 +363,7 @@ def get_hum_temp(**kwargs):
     cur.execute("CALL Get_hum_temp(?)", (kwargs["id"],))
     a = []
     for a_id, p_id, temp, hum, tim in cur:
-        a.append(Temperature_Humidity(id=p_id, temperature=temp, humidity=hum, tim=tim))
+        a.append(Temperature_Humidity(id=p_id, temperature=round(temp, 2), humidity=round(hum, 2), tim=tim))
     conn.close()
     return a[::-1]
 

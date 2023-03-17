@@ -26,7 +26,7 @@ def change_fork_state(extra: bool, token: str = Header(default=None)):
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_fork():
-        db.change_fork()
+        db.change_fork_state()
         state = db.get_fork()
         requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
@@ -39,13 +39,13 @@ def change_fork_state(extra: bool, token: str = Header(default=None)):
             num /= 4
             warnings = db.get_warnings()
             if float(num) > float(warnings.temperature):
-                db.change_fork()
+                db.change_fork_state()
                 state = db.get_fork()
                 requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
         else:
-            db.change_fork()
+            db.change_fork_state()
             state = db.get_fork()
             requests.patch(f"https://dt.miet.ru/ppo_it/api/fork_drive?state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
@@ -56,7 +56,7 @@ def change_total_hum_state(extra: bool, token: str = Header(default=None)):
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_total_hum():
-        db.change_total_hum()
+        db.change_total_hum_state()
         state = db.get_total_hum()
         requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
@@ -69,13 +69,13 @@ def change_total_hum_state(extra: bool, token: str = Header(default=None)):
             num /= 4
             warnings = db.get_warnings()
             if float(num) < float(warnings.humidity_air):
-                db.change_total_hum()
+                db.change_total_hum_state()
                 state = db.get_total_hum()
                 requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
         else:
-            db.change_total_hum()
+            db.change_total_hum_state()
             state = db.get_total_hum()
             requests.patch(f"https://dt.miet.ru/ppo_it/api/total_hum?state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
@@ -86,7 +86,7 @@ def change_watering_system_state(id: int, extra: bool, token: str = Header(defau
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_watering(id=id):
-        db.change_watering(id=id)
+        db.change_watering_state(id=id)
         state = db.get_watering(id=id)
         requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
@@ -96,13 +96,13 @@ def change_watering_system_state(id: int, extra: bool, token: str = Header(defau
             sensor_states = sensors_states[id-1]
             warnings = db.get_soil_warnings(id=id)
             if float(sensor_states) < float(warnings.hb):
-                db.change_watering(id=id)
+                db.change_watering_state(id=id)
                 state = db.get_watering(id=id)
                 requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
             return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
         else:
-            db.change_watering(id=id)
+            db.change_watering_state(id=id)
             state = db.get_watering(id=id)
             requests.patch(f"https://dt.miet.ru/ppo_it/api/watering?id={id}&state={state}")
             return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
@@ -117,7 +117,7 @@ def change_temperature_warnings(temperature: float, token: str = Header(default=
     if temperature > 100:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is greater than allowed values")
     else:
-        db.change_warnings_temp(temperature=temperature)
+        db.change_warnings_temperature(temperature=temperature)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_temp")
 
 
@@ -130,7 +130,7 @@ def change_humidity_air_warnings(humidity_air: float, token: str = Header(defaul
     if humidity_air > 100:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is greater than allowed values")
     else:
-        db.change_warnings_h(humidity_air=humidity_air)
+        db.change_warnings_humidity_air(humidity_air=humidity_air)
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_h")
 
 
@@ -143,7 +143,7 @@ def change_humidity_soil_warnings(id: int, humidity_soil: float, token: str = He
     if humidity_soil > 100:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is greater than allowed values")
     else:
-        db.change_warnings_hb(soil_warn=Soil_Warnings(id=id, hb=humidity_soil))
+        db.change_warnings_humidity_soil(soil_warn=Soil_Warnings(id=id, hb=humidity_soil))
     return JSONResponse(status_code=status.HTTP_200_OK, content="Changed warnings_hb")
 
 
@@ -178,7 +178,7 @@ def get_humidity_air_temperature_for_graphics():
 def get_humidity_soil_for_graphics():
     sensors_states = []
     for i in range(1, 7):
-        states = db.get_hum(hum_id=i)
+        states = db.get_hum_soil(hum_id=i)
         states_list = T_H_List(id=i, h_list=[], tim_list=[])
         for j in states:
             states_list.h_list.append(j.humidity)
