@@ -9,6 +9,9 @@ token = ''
 
 
 def create():
+    """
+        Функция для добавления новых данных с датчиков в базу данных раз в 5 минут
+    """
     tim = time.strftime("%H:%M")
     global token
     if datetime.datetime.now().minute % 5 == 0:
