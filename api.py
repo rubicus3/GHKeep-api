@@ -37,11 +37,12 @@ def change_fork_state(extra: bool, token: str = Header(default=None)):
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
     else:
         if not extra:
-            sensor_states = db.get_temp_from_temp_hum()[-4::]
+            st = db.get_temp_hum_num()
+            sensor_states = db.get_temp_from_temp_hum()[-st::]
             num = 0
             for i in sensor_states:
                 num += i.temperature
-            num /= 4
+            num /= st
             warnings = db.get_warnings()
             if float(num) > float(warnings.temperature):
                 db.change_fork_state()
@@ -72,11 +73,12 @@ def change_total_hum_state(extra: bool, token: str = Header(default=None)):
         return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
     else:
         if not extra:
-            sensor_states = db.get_hum_from_temp_hum()[-4::]
+            st = db.get_temp_hum_num()
+            sensor_states = db.get_hum_from_temp_hum()[-st::]
             num = 0
             for i in sensor_states:
                 num += i.humidity
-            num /= 4
+            num /= st
             warnings = db.get_warnings()
             if float(num) < float(warnings.humidity_air):
                 db.change_total_hum_state()
@@ -208,7 +210,8 @@ def get_humidity_air_temperature_for_graphics():
 
     """
     sensors_states = []
-    for i in range(1, 5):
+    st = db.get_temp_hum_num()
+    for i in range(1, st + 1):
         states = db.get_hum_temp(id=i)
         states_list = T_H_List(id=i, t_list=[], h_list=[], tim_list=[])
         for j in states:
@@ -227,7 +230,8 @@ def get_humidity_soil_for_graphics():
 
     """
     sensors_states = []
-    for i in range(1, 7):
+    st = db.get_hum_num()
+    for i in range(1, st + 1):
         states = db.get_hum_soil(hum_id=i)
         states_list = T_H_List(id=i, h_list=[], tim_list=[])
         for j in states:
@@ -251,13 +255,14 @@ def get_average_temperature():
     average_states_list = Average_List(d_list=[], t_list=[])
     num = 0 # счетчик
     average_state_time = ''
+    s = len(sensors_states) // 5
     for i in sensors_states:
-        if num < 4:
+        if num < s:
             temperature += i.temperature
             num += 1
             average_state_time = i.tim
-        if num == 4:
-            average_states_list.d_list.append(round((temperature/4), 2))
+        if num == s:
+            average_states_list.d_list.append(round((temperature / s), 2))
             average_states_list.t_list.append(average_state_time)
             num = 0
             temperature = 0
@@ -279,13 +284,14 @@ def get_average_humidity():
     average_states_list = Average_List(d_list=[], t_list=[])
     num = 0
     average_state_time = ''
+    s = len(sensors_states) // 5
     for i in sensors_states:
-        if num < 4:
+        if num < s:
             humidity += i.humidity
             num += 1
             average_state_time = i.tim
-        if num == 4:
-            average_states_list.d_list.append(round((humidity/4), 2))
+        if num == s:
+            average_states_list.d_list.append(round((humidity / s), 2))
             average_states_list.t_list.append(average_state_time)
             num = 0
             humidity = 0
@@ -330,7 +336,8 @@ def get_warnings_states():
     """
     air_warnings = db.get_warnings()
     soil_warnings = []
-    for i in range(1, 7):
+    st = db.get_hum_num()
+    for i in range(1, st + 1):
         soil_warnings.append(db.get_soil_warnings(id=i))
     return {"temperature": air_warnings.temperature,
             "humidity_air": air_warnings.humidity_air,
