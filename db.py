@@ -263,6 +263,8 @@ def change_warnings_humidity_soil(**kwargs):
 def get_temp_hum_for_table():
     """
 
+        Функция для получения последних данных о воздухе для таблицы
+
     """
     conn = wrapper()
     cur = conn.cursor()
@@ -278,6 +280,8 @@ def get_temp_hum_for_table():
 
 def get_hum_for_table():
     """
+
+        Функция для получения последних данных о почве для таблицы
 
     """
     conn = wrapper()

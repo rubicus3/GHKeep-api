@@ -10,6 +10,9 @@ from schemas import Temperature_Humidity, Warnings, Soil_Warnings
 
 
 def test_get_air_states():
+    """
+        Тест для проверки на запись в базу данных информации с датчиков состояния воздуха
+    """
     ls = []
     gt = []
     tim = time.strftime("%H:%M")
@@ -26,6 +29,9 @@ def test_get_air_states():
 
 
 def test_get_soil_states():
+    """
+            Тест для проверки на запись в базу данных информации с датчиков состояния почвы
+    """
     ls = []
     gt = []
     tim = time.strftime("%H:%M")
@@ -42,29 +48,44 @@ def test_get_soil_states():
 
 
 def test_change_fork_state():
+    """
+        Тест для проверки изменения состояния системы форточек
+    """
     st = 1 - db.get_fork()
     db.change_fork_state()
     assert st == db.get_fork()
 
 
 def test_change_total_hum_state():
+    """
+            Тест для проверки изменения состояния единой системы
+    """
     st = 1 - db.get_total_hum()
     db.change_total_hum_state()
     assert st == db.get_total_hum()
 
 
 def test_change_watering_state():
+    """
+            Тест для проверки изменения состояния системы полива
+    """
     st = 1 - db.get_watering(id=1)
     db.change_watering_state(id=1)
     assert st == db.get_watering(id=1)
 
 
 def test_change_air_warnings():
+    """
+        Тест для проверки изменения предельно допустимых значений у датчиков состояния воздуха
+    """
     db.change_warnings_temperature(temperature=25)
     db.change_warnings_humidity_air(humidity_air=68)
     assert db.get_warnings() == Warnings(temperature=25, humidity_air=68)
 
 
 def test_change_warnings_soil():
+    """
+            Тест для проверки изменения предельно допустимых значений у датчиков состояния почвы
+"""
     db.change_warnings_humidity_soil(soil_warn=Soil_Warnings(id=1, hb=73))
     assert Soil_Warnings(id=1, hb=73) == db.get_soil_warnings(id=1)

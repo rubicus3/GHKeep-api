@@ -23,6 +23,11 @@ app = fastapi.FastAPI()
 
 @app.put("/change_fork_state/{extra}", status_code=200)
 def change_fork_state(extra: bool, token: str = Header(default=None)):
+    """
+
+            Функция для изменения состояния форточек
+
+    """
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_fork():
@@ -53,6 +58,11 @@ def change_fork_state(extra: bool, token: str = Header(default=None)):
 
 @app.put("/change_total_hum_state/{extra}", status_code=200)
 def change_total_hum_state(extra: bool, token: str = Header(default=None)):
+    """
+
+            Функция для изменения состояния единой системы увлажнения
+
+    """
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_total_hum():
@@ -83,6 +93,11 @@ def change_total_hum_state(extra: bool, token: str = Header(default=None)):
 
 @app.put("/change_watering_system_state/{id}/{extra}", status_code=200)
 def change_watering_system_state(id: int, extra: bool, token: str = Header(default=None)):
+    """
+
+            Функция для изменения состояния одной из систем полива
+
+    """
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_watering(id=id):
@@ -110,6 +125,11 @@ def change_watering_system_state(id: int, extra: bool, token: str = Header(defau
 
 @app.put("/change_temperature_warnings/{temperature}", status_code=200)
 def change_temperature_warnings(temperature: float, token: str = Header(default=None)):
+    """
+
+            Функция для изменения порога среднего значения температуры
+
+    """
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if temperature < 0:
@@ -123,6 +143,11 @@ def change_temperature_warnings(temperature: float, token: str = Header(default=
 
 @app.put("/change_humidity_air_warnings/{humidity_air}", status_code=200)
 def change_humidity_air_warnings(humidity_air: float, token: str = Header(default=None)):
+    """
+
+            Функция для изменения порога среднего значения влажности воздуха
+
+    """
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if humidity_air < 0:
@@ -136,6 +161,11 @@ def change_humidity_air_warnings(humidity_air: float, token: str = Header(defaul
 
 @app.put("/change_humidity_soil_warnings/{id}/{humidity_soil}", status_code=200)
 def change_humidity_soil_warnings(id: int, humidity_soil: float, token: str = Header(default=None)):
+    """
+
+            Функция для изменения порога среднего значения влажности почвы
+
+    """
     if token != secret_token:
         return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if humidity_soil < 0:
@@ -152,16 +182,31 @@ def change_humidity_soil_warnings(id: int, humidity_soil: float, token: str = He
 
 @app.get("/get_humidity_air_temperature_for_table")
 def get_humidity_air_temperature_for_table():
+    """
+
+            Функция для получения последних данных о воздухе для таблицы
+
+    """
     return db.get_temp_hum_for_table()
 
 
 @app.get("/get_humidity_soil_for_table")
 def get_humidity_soil_for_table():
+    """
+
+            Функция для получения последних данных о почве для таблицы
+
+    """
     return T_H_List(h_list=db.get_hum_for_table())
 
 
 @app.get("/get_humidity_air_temperature_for_graphics")
 def get_humidity_air_temperature_for_graphics():
+    """
+
+            Функция для получения данных с датчиков воздуха для графиков
+
+    """
     sensors_states = []
     for i in range(1, 5):
         states = db.get_hum_temp(id=i)
@@ -176,6 +221,11 @@ def get_humidity_air_temperature_for_graphics():
 
 @app.get("/get_humidity_soil_for_graphics")
 def get_humidity_soil_for_graphics():
+    """
+
+                Функция для получения данных с датчиков почвы для графиков
+
+    """
     sensors_states = []
     for i in range(1, 7):
         states = db.get_hum_soil(hum_id=i)
@@ -244,21 +294,40 @@ def get_average_humidity():
 
 @app.get("/get_fork_state")
 def get_fork_state():
+    """
+
+            Функция для получения состояния системы форточек
+
+    """
     return db.get_fork()
 
 
 @app.get("/get_total_hum_state")
 def get_total_hum_state():
+    """
+            Функция для получения состояния единой системы
+
+    """
     return db.get_total_hum()
 
 
 @app.get("/get_watering_system_state/{id}")
 def get_watering_system_state(id: int):
+    """
+
+            Функция для получения состояния системы полива
+
+    """
     return db.get_watering(id=id)
 
 
 @app.get("/get_warnings_states")
 def get_warnings_states():
+    """
+
+            Функция для получения порогов средних значений
+
+    """
     air_warnings = db.get_warnings()
     soil_warnings = []
     for i in range(1, 7):

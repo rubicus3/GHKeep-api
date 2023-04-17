@@ -37,11 +37,17 @@ class List_Temperature_Humidity(BaseModel):
 
 
 class Average_List(BaseModel):
+    """
+        Класс для средних значений
+    """
     d_list: List[float]
     t_list: List[str]
 
 
 class T_H_List(BaseModel):
+    """
+        Класс для последних 5 значаний с одного датчика
+    """
     id: Optional[int]
     t_list: Optional[list]
     h_list: Optional[list]
