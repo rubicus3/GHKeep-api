@@ -15,14 +15,14 @@ def create():
     tim = time.strftime("%H:%M")
     global token
     if datetime.datetime.now().minute % 5 == 0:
-        air_sensors = (requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}"))
-        for i in air_sensors:
-            temp_hum = i
+        for i in range(1, 5):
+            request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}")
+            temp_hum = Temperature_Humidity(**request.json())
             temp_hum.tim = tim
             db.create_temp_hum(temperature_humidity=temp_hum)
-        hum_sensors = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{j}")
-        for j in hum_sensors:
-            hum = j
+        for j in range(1, 7):
+            request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{j}")  # тестовая строка
+            hum = Temperature_Humidity(**request.json())
             hum.tim = tim
             db.create_hum(temperature_humidity=hum)
 

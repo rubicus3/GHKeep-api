@@ -1,2 +1,2 @@
-mariadb_password = 'INT2201765'
+mariadb_password = 'cmz3cc'
 token = '123'

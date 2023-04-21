@@ -243,8 +243,8 @@ def get_temp_hum_for_table():
     a = []
     b = []
     for t, h in cur:
-        a.append(t)
-        b.append(h)
+        a.append(int(t))
+        b.append(int(h))
     conn.close()
     return T_H_List(t_list=(a[::-1]), h_list=(b[::-1]))
 
@@ -258,7 +258,7 @@ def get_hum_for_table():
     conn = wrapper()
     cur = conn.cursor()
     st = get_hum_num()
-    cur.execute("CALL Get_hum_for_table(?)". (st,))
+    cur.execute("CALL Get_hum_for_table(?)", (st,))
     a = []
     for i in cur:
         for x in i:
