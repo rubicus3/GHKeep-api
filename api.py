@@ -10,12 +10,10 @@ import time
 
 import arduino_connect
 import db
-import requests
 import fastapi
 from fastapi.responses import JSONResponse
-from fastapi import status, Header
+from fastapi import status
 from schemas import Average_List, T_H_List, Soil_Warnings
-from constants import token as secret_token
 
 app = fastapi.FastAPI()
 
@@ -24,14 +22,12 @@ app = fastapi.FastAPI()
 
 
 @app.put("/change_fork_state/{extra}", status_code=200)
-def change_fork_state(extra: bool, token: str = Header(default=None)):
+def change_fork_state(extra: bool):
     """
 
             Функция для изменения состояния форточек
 
     """
-    if token != secret_token:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_fork():
         db.change_fork_state()
         state = db.get_fork()
@@ -51,7 +47,9 @@ def change_fork_state(extra: bool, token: str = Header(default=None)):
                 state = db.get_fork()
                 arduino_connect.change_fork_state(state)
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed fork")
-            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average temperature did not exceed the permissible value")
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                                content="The average temperature did not exceed the permissible value"
+                                )
         else:
             db.change_fork_state()
             state = db.get_fork()
@@ -60,14 +58,12 @@ def change_fork_state(extra: bool, token: str = Header(default=None)):
 
 
 @app.put("/change_total_hum_state/{extra}", status_code=200)
-def change_total_hum_state(extra: bool, token: str = Header(default=None)):
+def change_total_hum_state(extra: bool):
     """
 
             Функция для изменения состояния единой системы увлажнения
 
     """
-    if token != secret_token:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_total_hum():
         db.change_total_hum_state()
         state = db.get_total_hum()
@@ -87,7 +83,9 @@ def change_total_hum_state(extra: bool, token: str = Header(default=None)):
                 state = db.get_total_hum()
                 arduino_connect.change_total_hum_state(state)
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed total_hum")
-            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The average humidity did not fall below the permissible value")
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                                content="The average humidity did not fall below the permissible value"
+                                )
         else:
             db.change_total_hum_state()
             state = db.get_total_hum()
@@ -96,14 +94,12 @@ def change_total_hum_state(extra: bool, token: str = Header(default=None)):
 
 
 @app.put("/change_watering_system_state/{id}/{extra}", status_code=200)
-def change_watering_system_state(id: int, extra: bool, token: str = Header(default=None)):
+def change_watering_system_state(id: int, extra: bool):
     """
 
             Функция для изменения состояния одной из систем полива
 
     """
-    if token != secret_token:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if db.get_watering(id=id):
         db.change_watering_state(id=id)
         state = db.get_watering(id=id)
@@ -127,7 +123,9 @@ def change_watering_system_state(id: int, extra: bool, token: str = Header(defau
                 state = db.get_watering(id=id)
                 arduino_connect.change_watering_system(state)
                 return JSONResponse(status_code=status.HTTP_200_OK, content="Changed watering")
-            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="The Hb did not fall below the permissible value")
+            return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                                content="The Hb did not fall below the permissible value"
+                                )
         else:
             db.change_watering_state(id=id)
             state = db.get_watering(id=id)
@@ -140,14 +138,12 @@ def change_watering_system_state(id: int, extra: bool, token: str = Header(defau
 
 
 @app.put("/change_temperature_warnings/{temperature}", status_code=200)
-def change_temperature_warnings(temperature: float, token: str = Header(default=None)):
+def change_temperature_warnings(temperature: float):
     """
 
             Функция для изменения порога среднего значения температуры
 
     """
-    if token != secret_token:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if temperature < 0:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
     if temperature > 100:
@@ -158,14 +154,12 @@ def change_temperature_warnings(temperature: float, token: str = Header(default=
 
 
 @app.put("/change_humidity_air_warnings/{humidity_air}", status_code=200)
-def change_humidity_air_warnings(humidity_air: float, token: str = Header(default=None)):
+def change_humidity_air_warnings(humidity_air: float):
     """
 
             Функция для изменения порога среднего значения влажности воздуха
 
     """
-    if token != secret_token:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if humidity_air < 0:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
     if humidity_air > 100:
@@ -176,14 +170,12 @@ def change_humidity_air_warnings(humidity_air: float, token: str = Header(defaul
 
 
 @app.put("/change_humidity_soil_warnings/{id}/{humidity_soil}", status_code=200)
-def change_humidity_soil_warnings(id: int, humidity_soil: float, token: str = Header(default=None)):
+def change_humidity_soil_warnings(id: int, humidity_soil: float):
     """
 
             Функция для изменения порога среднего значения влажности почвы
 
     """
-    if token != secret_token:
-        return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED, content='I forbid you')
     if humidity_soil < 0:
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content="Value is less than allowed values")
     if humidity_soil > 100:
@@ -267,7 +259,7 @@ def get_average_temperature():
     sensors_states = db.get_temp_from_temp_hum()
     temperature = 0
     average_states_list = Average_List(d_list=[], t_list=[])
-    num = 0 # счетчик
+    num = 0  # счетчик
     average_state_time = ''
     s = len(sensors_states) // 5
     for i in sensors_states:
