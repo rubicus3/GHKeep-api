@@ -2,8 +2,10 @@ import datetime
 import time
 import requests
 
+
 import db
 from schemas import Temperature_Humidity
+from constants import arduino_link
 
 token = ''
 
@@ -14,15 +16,16 @@ def create():
     """
     tim = time.strftime("%H:%M")
     global token
-    if datetime.datetime.now().minute % 5 == 0:
-        for i in range(1, 5):
-            request = requests.get(f"https://dt.miet.ru/ppo_it/api/temp_hum/{i}")
-            temp_hum = Temperature_Humidity(**request.json())
+    if datetime.datetime.now().minute % 1 == 0:
+        air_sensors = requests.get(f"{arduino_link}/get_air_stats").json()
+        for i in air_sensors:
+            temp_hum = Temperature_Humidity(**i)
             temp_hum.tim = tim
             db.create_temp_hum(temperature_humidity=temp_hum)
-        for j in range(1, 7):
-            request = requests.get(f"https://dt.miet.ru/ppo_it/api/hum/{j}")  # тестовая строка
-            hum = Temperature_Humidity(**request.json())
+
+        hum_sensors = requests.get(f"{arduino_link}/get_soil_stats").json()
+        for j in hum_sensors:
+            hum = Temperature_Humidity(**j)
             hum.tim = tim
             db.create_hum(temperature_humidity=hum)
 
