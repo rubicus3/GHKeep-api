@@ -1,2 +1,2 @@
-mariadb_password = 'INT2201765'
+mariadb_password = 'cmz3cc'
 arduino_link = 'http://192.168.3.38'
